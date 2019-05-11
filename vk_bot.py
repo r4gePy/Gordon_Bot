@@ -6,7 +6,7 @@ def write_msg(user_id, message):
     vk.method('message.send', {'user_id':user_id, 'message':message,
                                'random_id':0})
 
-token = "5a1c5dd1b0b83ec50812fd33576df54ffcfb916d2386d9771d879b54de9dd126a0a078fc346a023fd98a2"
+token = "..."
 
 vk = vk_api.VkApi(token=token)
 
