@@ -3,7 +3,7 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 
 
 def write_msg(user_id, message):
-    vk.method('message.send', {'user_id':user_id, 'message':message,
+    vk.method('messages.send', {'user_id':user_id, 'message':message,
                                'random_id':0})
 
 token = "..."
