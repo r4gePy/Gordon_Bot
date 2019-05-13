@@ -5,13 +5,13 @@ filename = "ID_Users.txt"
 
 
 def add_id(user_id):
-    status = True
+    status = 1
     with open(filename, "r+") as f:
         for x in f.readlines():
             if x.strip() in str(user_id):
-                status = False
+                status = 0
                 break
-        if status:
+        if status == 1:
             f.write(str(user_id))
 
 
@@ -21,7 +21,7 @@ def write_msg(user_id, message):
 
 
 def send_schedule(user_id):
-    filename = "schedule.txt"
+    filename = "schedule.txt"a
     message = ''
     with open(filename, "r") as f:
         for line in f.readlines():
