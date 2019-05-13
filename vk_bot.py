@@ -1,6 +1,8 @@
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 import datetime as dt
+import time
+
 filename = "ID_Users.txt"
 
 
@@ -21,7 +23,7 @@ def write_msg(user_id, message):
 
 
 def send_schedule(user_id):
-    filename = "schedule.txt"a
+    filename = "schedule.txt"
     message = ''
     with open(filename, "r") as f:
         for line in f.readlines():
@@ -43,3 +45,32 @@ while True:
             if event.text.lower() == "урок":
                 if dt.datetime.today().isoweekday() in (6, 7):
                     write_msg(event.user_id, "Сегодня уроков нет :)")
+                else:
+                    time_local = time.localtime()
+                    minutes = (60*time_local.tm_hour) + time_local.tm_min
+                    if minutes < 510:
+                        write_msg(event.user_id,
+                                  "До начала первого урока(мин.) :" +
+                                  str(510-minutes))
+                    elif 510 < minutes < 550:
+                        write_msg(event.user_id,
+                                  "До конца первого урока(мин.) :" +
+                                  str(550-minutes))
+                    elif 550 < minutes < 560:
+                        write_msg(event.user_id,
+                                  "До начала второго урока(мин.) :" +
+                                  str(560-minutes))
+                    elif 560 < minutes < 600:
+                        write_msg(event.user_id,
+                                  "До конца второго урока(мин.) :" +
+                                  str(600-minutes))
+                    elif 600 < minutes < 615:
+                        write_msg(event.user_id,
+                                  "До начала третьего урока(мин.) :" +
+                                  str(615-minutes))
+                    elif 615 < minutes < 655:
+                        write_msg(event.user_id,
+                                  "До конца третьего урока(мин.) :" +
+                                  str(655-minutes))
+                    elif 500:
+                        pass
