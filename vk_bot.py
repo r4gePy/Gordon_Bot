@@ -64,59 +64,59 @@ while True:
                     minutes = (60*time_local.tm_hour) + time_local.tm_min
                     if minutes < 510:
                         write_msg(event.user_id,
-                                  "До начала первого урока(мин.) :" +
+                                  "До начала первого урока(мин.): " +
                                   str(510-minutes))
                     elif 510 < minutes < 550:
                         write_msg(event.user_id,
-                                  "До конца первого урока(мин.) :" +
+                                  "До конца первого урока(мин.): " +
                                   str(550-minutes))
                     elif 550 < minutes < 560:
                         write_msg(event.user_id,
-                                  "До начала второго урока(мин.) :" +
+                                  "До начала второго урока(мин.): " +
                                   str(560-minutes))
                     elif 560 < minutes < 600:
                         write_msg(event.user_id,
-                                  "До конца второго урока(мин.) :" +
+                                  "До конца второго урока(мин.): " +
                                   str(600-minutes))
                     elif 600 < minutes < 615:
                         write_msg(event.user_id,
-                                  "До начала третьего урока(мин.) :" +
+                                  "До начала третьего урока(мин.): " +
                                   str(615-minutes))
                     elif 615 < minutes < 655:
                         write_msg(event.user_id,
-                                  "До конца третьего урока(мин.) :" +
+                                  "До конца третьего урока(мин.): " +
                                   str(655-minutes))
                     elif 655 < minutes < 670:
                         write_msg(event.user_id,
-                                  "До начала четвертого урока(мин.) :" +
+                                  "До начала четвертого урока(мин.): " +
                                   str(670-minutes))
                     elif 670 < minutes < 710:
                         write_msg(event.user_id,
-                                  "До конца четвертого урока(мин.) :" +
+                                  "До конца четвертого урока(мин.): " +
                                   str(710-minutes))
                     elif 710 < minutes < 725:
                         write_msg(event.user_id,
-                                  "До начала пятого урока(мин.) :" +
+                                  "До начала пятого урока(мин.): " +
                                   str(725-minutes))
                     elif 725 < minutes < 765:
                         write_msg(event.user_id,
-                                  "До конца пятого урока(мин.) :" +
+                                  "До конца пятого урока(мин.): " +
                                   str(765-minutes))
                     elif 765 < minutes < 775:
                         write_msg(event.user_id,
-                                  "До начала шестого урока(мин.) :" +
+                                  "До начала шестого урока(мин.): " +
                                   str(775-minutes))
                     elif 775 < minutes < 815:
                         write_msg(event.user_id,
-                                  "До конца шестого урока(мин.) :" +
+                                  "До конца шестого урока(мин.): " +
                                   str(815-minutes))
                     elif 815 < minutes < 825:
                         write_msg(event.user_id,
-                                  "До начала седьмого урока(мин.) :" +
+                                  "До начала седьмого урока(мин.): " +
                                   str(825-minutes))
                     elif 825 < minutes < 865:
                         write_msg(event.user_id,
-                                  "До конца седьмого урока(мин.) :" +
+                                  "До конца седьмого урока(мин.): " +
                                   str(865-minutes))
                     else:
                         write_msg(event.user_id, "Уроки закончились.")
