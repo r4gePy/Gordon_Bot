@@ -40,6 +40,10 @@ def send_schedule(user_id):
             message += "    "+line
     write_msg(user_id, message)
 
+def send_newsletter():
+    pass
+
+
 token = "0d32f1db60514159733d06bddc33fac80a6636d535994801ac8c9d45cf361f66e8a8caa9180889b8e02f9"
 
 vk = vk_api.VkApi(token=token)
@@ -120,4 +124,8 @@ while True:
                                   str(865-minutes))
                     else:
                         write_msg(event.user_id, "Уроки закончились.")
-
+            if event.text.lower() == "рассылка" and event.user_id == 194674349:
+                write_msg(event.user_id, "Отправить рассылку всем известным"
+                                         "пользователям?")
+                if event.text.lower() == "да":
+                    send_newsletter()
