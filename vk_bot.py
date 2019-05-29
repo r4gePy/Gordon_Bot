@@ -2,11 +2,21 @@ import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 import datetime as dt
 import time
-import sqlite3
 import json
+from peewee import *
 
-conn = sqlite3.connect("users_id.db")
-cursor = conn.cursor()
+db = SqliteDatabase("USERS.db")
+
+
+class INFO(Model):
+    ID = IntegerField()
+    FNAME = TextField()
+    SNAME = TextField()
+    ST = IntegerField()
+
+    class Meta:
+        database = db
+
 
 KEYBOARD_START = {
     "one_time": False,
@@ -19,13 +29,13 @@ KEYBOARD_START = {
             },
             "color": "negative"
         },
-        {
-            "action": {
-                "type": "text",
-                "payload": "{\"button\": \"2\"}",
-                "label": "Расписание"
-            },
-            "color": "positive"
+            {
+                "action": {
+                    "type": "text",
+                    "payload": "{\"button\": \"2\"}",
+                    "label": "Расписание"
+                },
+                "color": "positive"
             },
 
             {
@@ -37,15 +47,15 @@ KEYBOARD_START = {
                 "color": "default"
             }
         ],
-            [{
-                "action": {
-                    "type": "text",
-                    "payload": "{\"button\": \"4\"}",
-                    "label": "Default",
-                },
-                "color": "primary"
-            }]
-        ]
+        [{
+            "action": {
+                "type": "text",
+                "payload": "{\"button\": \"4\"}",
+                "label": "Default",
+            },
+            "color": "primary"
+        }]
+    ]
 }
 
 
@@ -54,24 +64,28 @@ def get_info(user_id):
 
 
 def add_in_table(id, first_name, second_name):
-    info = [(id, first_name, second_name)]
-    sql = "SELECT ID FROM USERS_INFO"
-    cursor.execute(sql)
-    ids = cursor.fetchall()
-    rez = True
-    for usr in ids:
-        if usr[0] == id:
-            rez = False
+    st = True
+    for usr_id in INFO.select():
+        if usr_id.ID == id:
+            st = False
             break
+    if st:
+        INFO.create(ID=id, FNAME=first_name, SNAME=second_name,
+                    ST=0)
+
+
+def check_status(id):
+    rez = False
+    for status in INFO.select():
+        if status.STATUS == 0 and status.ID == id:
+            rez = True
     if rez:
-        cursor.executemany("INSERT INTO main.USERS_INFO VALUES (?, ?, ?)", info)
-        conn.commit()
+        return "+"
 
 
 def write_msg(user_id, message):
     vk.method("messages.send", {"user_id": user_id, "message": message,
-                                "random_id": 0, "keyboard": str(
-            json.dumps(KEYBOARD_START, ensure_ascii=False))})
+                                "random_id": 0})
 
 
 def send_schedule(user_id):
@@ -95,9 +109,6 @@ while True:
             user_info = get_info(event.user_id)
             add_in_table(event.user_id, user_info[0]["first_name"],
                          user_info[0]["last_name"])
-            write_msg(event.user_id,
-                      "Привет, " + user_info[0]["first_name"] + "!")
-
             if event.text.lower() == "расписание":
                 send_schedule(event.user_id)
             if event.text.lower() == "урок":
