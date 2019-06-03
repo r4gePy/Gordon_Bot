@@ -109,6 +109,10 @@ while True:
             user_info = get_info(event.user_id)
             add_in_table(event.user_id, user_info[0]["first_name"],
                          user_info[0]["last_name"])
+            hi = check_status(event.user_id)
+            if hi == "+":
+                write_msg(event.user_id, "Привет " + user_info[0]["first_name"])
+
             if event.text.lower() == "расписание":
                 send_schedule(event.user_id)
             if event.text.lower() == "урок":
