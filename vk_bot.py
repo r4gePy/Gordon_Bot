@@ -3,23 +3,15 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 import datetime as dt
 import time
 import json
-from peewee import *
+from classes_for_tables import *
 
-db = SqliteDatabase("USERS.db")
-
-
-class INFO(Model):
-    ID = IntegerField()
-    FNAME = TextField()
-    SNAME = TextField()
-    ST = IntegerField()
-
-    class Meta:
-        database = db
-
+usr_m = "Для общения с ботом используй цветные блоки(клавиатуру):\n " \
+        "'Урок' - ответом бота будет количество минут, оставшееся до конца " \
+        "или начала урока\n" \
+        "'Расписание' - ты получишь расписание уроков на всю неделю"
 
 KEYBOARD_START = {
-    "one_time": False,
+    "one_time": None,
     "buttons": [
         [{
             "action": {
@@ -37,25 +29,17 @@ KEYBOARD_START = {
                 },
                 "color": "positive"
             },
+        ]
 
-            {
-                "action": {
-                    "type": "text",
-                    "payload": "{\"button\": \"3\"}",
-                    "label": "Комманды",
-                },
-                "color": "default"
-            }
-        ],
-        [{
-            "action": {
-                "type": "text",
-                "payload": "{\"button\": \"4\"}",
-                "label": "Default",
-            },
-            "color": "primary"
-        }]
     ]
+}
+
+dict_days = {
+    1: "monday",
+    2: "tuesday",
+    3: "wednesday",
+    4: "thursday",
+    5: "friday"
 }
 
 
@@ -63,29 +47,26 @@ def get_info(user_id):
     return vk.method("users.get", {"user_ids": user_id})
 
 
-def add_in_table(id, first_name, second_name):
+def add_in_table(id):
     st = True
     for usr_id in INFO.select():
         if usr_id.ID == id:
             st = False
             break
     if st:
-        INFO.create(ID=id, FNAME=first_name, SNAME=second_name,
+        INFO.create(ID=id,
+                    FNAME=user_info[0]["first_name"],
+                    SNAME=user_info[0]["last_name"],
                     ST=0)
 
 
-def check_status(id):
-    rez = False
-    for status in INFO.select():
-        if status.STATUS == 0 and status.ID == id:
-            rez = True
-    if rez:
-        return "+"
-
-
 def write_msg(user_id, message):
-    vk.method("messages.send", {"user_id": user_id, "message": message,
-                                "random_id": 0})
+    vk.method("messages.send",
+              {"user_id": user_id,
+               "message": message,
+               "random_id": 0,
+               "keyboard": json.dumps(KEYBOARD_START,
+                                      ensure_ascii=False)})
 
 
 def send_schedule(user_id):
@@ -107,16 +88,22 @@ while True:
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and not event.from_me:
             user_info = get_info(event.user_id)
-            add_in_table(event.user_id, user_info[0]["first_name"],
-                         user_info[0]["last_name"])
-            hi = check_status(event.user_id)
-            if hi == "+":
-                write_msg(event.user_id, "Привет " + user_info[0]["first_name"])
-
+            add_in_table(event.user_id)
+            if event.text.lower() in ("привет", "здорова", "ку", "хай", "прив",
+                                      "йоу"):
+                write_msg(event.user_id, "Здравствуй "
+                          + user_info[0]['first_name'])
+                write_msg(event.user_id, "Хочешь узнать как пользоваться ботом?"
+                                         " Напиши !help")
+            if event.text.lower() == "!help":
+                write_msg(event.user_id, usr_m)
             if event.text.lower() == "расписание":
-                send_schedule(event.user_id)
+                write_msg(event.user_id, "*здесь должно быть расписание, "
+                                         "но сейчас лето*")
             if event.text.lower() == "урок":
-                if dt.datetime.today().isoweekday() in (6, 7):
+                if dt.datetime.today().month in (6, 7, 8):
+                    write_msg(event.user_id, "Сейчас лето, отдыхай :D")
+                elif dt.datetime.today().isoweekday() in (6, 7):
                     write_msg(event.user_id, "Сегодня уроков нет :)")
                 # Высчитывание кол-ва минут до начала/конца урока
                 else:
@@ -180,3 +167,15 @@ while True:
                                   str(865 - minutes))
                     else:
                         write_msg(event.user_id, "Уроки закончились.")
+            if (event.user_id == 194674349 or event.user_id == 213696138) \
+                    and event.text.lower() == "дз+":
+                write_msg(event.user_id,
+                          "На какой день будет дано дз?")
+                msg_schedule = ""
+                for numb, day in dict_days.items():
+                    msg_schedule += f'{str(numb)}. {day}\n'
+                write_msg(event.user_id, msg_schedule)
+                for event_dz in longpoll.listen():
+                    if event_dz.type == VkEventType.MESSAGE_NEW and \
+                            not event_dz.from_me:
+                                pass
