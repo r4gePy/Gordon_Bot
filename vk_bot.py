@@ -90,6 +90,7 @@ def send_schedule(user_id):
     write_msg(user_id, message)
 
 
+<<<<<<< HEAD
 def add_homework(number_of_day, homework, numb_of_lesson = 1):
     if number_of_day == 1:
         lesson = dict_monday.get(numb_of_lesson)
@@ -97,6 +98,9 @@ def add_homework(number_of_day, homework, numb_of_lesson = 1):
             if lsn.Lesson == lesson:
                 lsn.HW = homework
                 lsn.save()
+=======
+token = "[your_token]"
+>>>>>>> 512a961b225da4d17b71293ab8d1bc81aa586838
 
 
 def show_homework(day):
