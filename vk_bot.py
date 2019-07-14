@@ -226,6 +226,6 @@ while True:
                             write_msg(event.user_id, "Домашнее задание успешно "
                                                      "добавлено.")
                             break
-                        else:
+                        else:   
                             break
                         counter += 1
