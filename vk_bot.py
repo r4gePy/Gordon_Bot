@@ -78,7 +78,7 @@ def send_schedule(user_id):
     write_msg(user_id, message)
 
 
-token = "0d32f1db60514159733d06bddc33fac80a6636d535994801ac8c9d45cf361f66e8a8caa9180889b8e02f9"
+token = "[your_token]"
 
 vk = vk_api.VkApi(token=token)
 
