@@ -58,4 +58,3 @@ class INFO(Model):
 
     class Meta:
         database = db_info
-

@@ -27,15 +27,14 @@ dict_tables = {
     5: FRIDAY
 }
 
-token = "0d32f1db60514159733d06bddc33fac80a6636d5359" \
-        "94801ac8c9d45cf361f66e8a8caa9180889b8e02f9"
+token = "6e40528ec07a9a6f5cb1a96d503aecb8132f0fa2537f37d1a5706b91b91c7daca74cd7c156b739ab3d2b0"
 
-vk = vk_api.VkApi(token = token)
+vk = vk_api.VkApi(token=token)
 
 longpoll = VkLongPoll(vk)
 
 
-def send_weekdays(st = 'add'):
+def send_weekdays(st='add'):
     msg_schedule = ""
     for numb, day in dict_days.items():
         msg_schedule += f'{str(numb)}. {day}\n'
@@ -49,9 +48,9 @@ def send_weekdays(st = 'add'):
 
 def send_current_lsn(numb_of_day):
     msg_lsns = ""
-    if numb_of_day == 1:
-        for lsn in MONDAY.select():
-            msg_lsns += str(lsn.id) + '. ' + lsn.Lesson + '\n'
+    day_lsn = dict_tables.get(numb_of_day)
+    for day in day_lsn.select():
+        msg_lsns += str(day.id) + '. ' + day.Lesson + '\n'
     write_msg(event.user_id, msg_lsns)
 
 
@@ -66,9 +65,9 @@ def add_in_table(id_for_info):
             st = False
             break
     if st:
-        INFO.create(ID_VK = id_for_info,
-                    F_NAME = user_info[0]["first_name"],
-                    S_NAME = user_info[0]["last_name"],
+        INFO.create(ID_VK=id_for_info,
+                    F_NAME=user_info[0]["first_name"],
+                    S_NAME=user_info[0]["last_name"],
                     )
 
 
@@ -78,7 +77,7 @@ def write_msg(user_id, message):
                "message": message,
                "random_id": 0,
                "keyboard": json.dumps(KEYBOARD_START,
-                                      ensure_ascii = False)})
+                                      ensure_ascii=False)})
 
 
 def send_schedule(user_id):
@@ -90,24 +89,22 @@ def send_schedule(user_id):
     write_msg(user_id, message)
 
 
-<<<<<<< HEAD
-def add_homework(number_of_day, homework, numb_of_lesson = 1):
-    if number_of_day == 1:
-        lesson = dict_monday.get(numb_of_lesson)
-        for lsn in MONDAY.select():
-            if lsn.Lesson == lesson:
-                lsn.HW = homework
-                lsn.save()
-=======
-token = "[your_token]"
->>>>>>> 512a961b225da4d17b71293ab8d1bc81aa586838
+def add_homework(number_of_day, homework_message, numb_of_lesson):
+    day = dict_tables.get(number_of_day)
+    for data in day.select():
+        if data.id == numb_of_lesson:
+            data.HW = homework_message
+            data.save()
 
 
-def show_homework(day):
+def show_lessons(day, status=True):
     lesson = dict_tables.get(day)
     schedule = ''
     for hw in lesson.select():
-        schedule += f"{hw.Lesson} - {hw.HW}\n"
+        if status:
+            schedule += f"{hw.Lesson} - {hw.HW}\n"
+        else:
+            schedule += f"{hw.id}.{hw.Lesson}\n"
     write_msg(event.user_id, schedule)
 
 
@@ -117,7 +114,7 @@ while True:
             user_info = get_info(event.user_id)
             add_in_table(event.user_id)
             if event.text.lower() in ("привет", "здорова", "ку", "хай", "прив",
-                                      "йоу"):
+                                      "йоу", "начать"):
                 write_msg(event.user_id, "Здравствуй "
                           + user_info[0]['first_name'])
                 write_msg(event.user_id, "Хочешь узнать как пользоваться ботом?"
@@ -125,15 +122,23 @@ while True:
             if event.text.lower() == "!help":
                 write_msg(event.user_id, usr_m)
             if event.text.lower() == "расписание":
-                write_msg(event.user_id, "*здесь должно быть расписание, "
-                                         "но сейчас лето*")
+                write_msg(event.user_id, "На какой день нужно расписание?")
+                send_weekdays(st="show")
+                for event_send_schedule in longpoll.listen():
+                    if event_send_schedule.type == VkEventType.MESSAGE_NEW and not \
+                            event_send_schedule.from_me and len(event_send_schedule.text) <= 1:
+                        show_lessons(int(event_send_schedule.text), status=False)
+                        break
             if event.text.lower() == "урок":
-
                 if dt.datetime.today().month in (6, 7, 8):
                     write_msg(event.user_id, "Сейчас лето, отдыхай :D")
                 elif dt.datetime.today().isoweekday() in (6, 7):
-                    write_msg(event.user_id, "Сегодня уроков нет :)")
-                # Высчитывание кол-ва минут до начала/конца урока
+                    write_msg(event.user_id, "Сегодня выходной :)")
+
+                    """ 
+                    Высчитывание кол-во минут    до конца урока 
+                    """
+
                 else:
                     time_local = time.localtime()
                     minutes = (60 * time_local.tm_hour) + time_local.tm_min
@@ -196,15 +201,14 @@ while True:
                     else:
                         write_msg(event.user_id, "Уроки закончились.")
             if event.text.lower() == "узнать дз":
-                write_msg(event.user_id, f"На какой день ты хочешь узнать ДЗ?")
-                send_weekdays(st = "show")
+                write_msg(event.user_id, "На какой день ты хочешь узнать ДЗ?")
+                send_weekdays(st="show")
                 for event_show_hw in longpoll.listen():
                     if event_show_hw.type == VkEventType.MESSAGE_NEW and not \
                             event_show_hw.from_me:
-                        show_homework(int(event_show_hw.text))
+                        show_lessons(int(event_show_hw.text))
                         break
-            if (event.user_id == 194674349 or event.user_id == 213696138 or
-                event.user_id == 214280089) \
+            if (event.user_id == 194674349 or event.user_id == 183461346) \
                     and event.text.lower() == "дз+":
                 counter = 1
                 numb_day = ""
@@ -216,20 +220,21 @@ while True:
                         if counter == 1 and len(dz_msg.text) == 1:
                             numb_day = int(dz_msg.text)
                             send_current_lsn(numb_day)
-                            print(f"first if {dz_msg.text}")
+
                         elif counter == 2 and len(dz_msg.text) == 1:
-                            print(f"second if {dz_msg.text}")
+
                             numb_lesson = dz_msg.text
                             write_msg(dz_msg.user_id, f"Следующее сообщение "
                                                       f"будет записано как дз:")
+
                         elif counter == 3:
-                            print(f"third if {dz_msg.text}")
-                            add_homework(number_of_day = numb_day,
-                                         homework = dz_msg.text,
-                                         numb_of_lesson = int(numb_lesson))
+
+                            add_homework(number_of_day=numb_day,
+                                         homework_message=dz_msg.text,
+                                         numb_of_lesson=int(numb_lesson))
                             write_msg(event.user_id, "Домашнее задание успешно "
                                                      "добавлено.")
                             break
-                        else:   
+                        else:
                             break
                         counter += 1

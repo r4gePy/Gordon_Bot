@@ -19,7 +19,7 @@ dict_tables = {
 }
 
 
-def send_weekdays(st = 'add'):
+def send_weekdays(st='add'):
     msg_schedule = ""
     for numb, day in dict_days.items():
         msg_schedule += f'{str(numb)}. {day}\n'
@@ -43,26 +43,13 @@ def get_info(user_id):
     return vk.method("users.get", {"user_ids": user_id})
 
 
-def add_in_table(id_for_info):
-    st = True
-    for usr_id in INFO.select():
-        if usr_id.ID_VK == id_for_info:
-            st = False
-            break
-    if st:
-        INFO.create(ID_VK = id_for_info,
-                    F_NAME = user_info[0]["first_name"],
-                    S_NAME = user_info[0]["last_name"],
-                    )
-
-
 def write_msg(user_id, message):
     vk.method("messages.send",
               {"user_id": user_id,
                "message": message,
                "random_id": 0,
                "keyboard": json.dumps(KEYBOARD_START,
-                                      ensure_ascii = False)})
+                                      ensure_ascii=False)})
 
 
 def send_schedule(user_id):
@@ -74,13 +61,12 @@ def send_schedule(user_id):
     write_msg(user_id, message)
 
 
-def add_homework(number_of_day, homework, numb_of_lesson = 1):
-    if number_of_day == 1:
-        lesson = dict_monday.get(numb_of_lesson)
-        for lsn in MONDAY.select():
-            if lsn.Lesson == lesson:
-                lsn.HW = homework
-                lsn.save()
+def add_homework(number_of_day, homework_message, numb_of_lesson):
+    day = dict_tables.get(number_of_day)
+    for data in day.select():
+        if data.id == numb_of_lesson:
+            data.HW = homework_message
+            data.save()
 
 
 def show_homework(day):
@@ -89,3 +75,4 @@ def show_homework(day):
     for hw in lesson.select():
         schedule += f"{hw.Lesson} - {hw.HW}\n"
     write_msg(event.user_id, schedule)
+
