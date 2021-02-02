@@ -27,7 +27,7 @@ dict_tables = {
     5: FRIDAY
 }
 
-token = "6e40528ec07a9a6f5cb1a96d503aecb8132f0fa2537f37d1a5706b91b91c7daca74cd7c156b739ab3d2b0"
+token = "..."
 
 vk = vk_api.VkApi(token=token)
 
