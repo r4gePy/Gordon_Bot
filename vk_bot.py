@@ -27,7 +27,11 @@ dict_tables = {
     5: FRIDAY
 }
 
+<<<<<<< HEAD
 token = "2ea22b0432d68245816992228cb95135729f1724e2b2b1cd3be8b038cd97d854df7af3a2c9244f18c2493"
+=======
+token = "..."
+>>>>>>> b19e400ce7999ad2b13f87241e6a206fa477aa3f
 
 vk = vk_api.VkApi(token=token)
 
