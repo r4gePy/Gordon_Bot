@@ -27,7 +27,7 @@ dict_tables = {
     5: FRIDAY
 }
 
-token = "6e40528ec07a9a6f5cb1a96d503aecb8132f0fa2537f37d1a5706b91b91c7daca74cd7c156b739ab3d2b0"
+token = "..."
 
 vk = vk_api.VkApi(token=token)
 
@@ -118,8 +118,8 @@ while True:
                 write_msg(event.user_id, "Здравствуй "
                           + user_info[0]['first_name'])
                 write_msg(event.user_id, "Хочешь узнать как пользоваться ботом?"
-                                         " Напиши !help")
-            if event.text.lower() == "!help":
+                                         " Напиши .1.")
+            if event.text.lower() == ".1.":
                 write_msg(event.user_id, usr_m)
             if event.text.lower() == "расписание":
                 write_msg(event.user_id, "На какой день нужно расписание?")
