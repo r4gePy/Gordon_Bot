@@ -4,7 +4,7 @@ import datetime as dt
 import time
 import json
 from classes_for_tables import *
-from keyboards import KEYBOARD_START
+from keyboards import *
 
 usr_m = "Для общения с ботом используй цветные блоки(клавиатуру):\n " \
         "'Урок' - ответом бота будет количество минут, оставшееся до конца " \
@@ -27,7 +27,7 @@ dict_tables = {
     5: FRIDAY
 }
 
-token = "..."
+token = "2ea22b0432d68245816992228cb95135729f1724e2b2b1cd3be8b038cd97d854df7af3a2c9244f18c2493"
 
 vk = vk_api.VkApi(token=token)
 
@@ -80,15 +80,6 @@ def write_msg(user_id, message):
                                       ensure_ascii=False)})
 
 
-def send_schedule(user_id):
-    filename = "schedule.txt"
-    message = ""
-    with open(filename, "r") as f:
-        for line in f.readlines():
-            message += "    " + line
-    write_msg(user_id, message)
-
-
 def add_homework(number_of_day, homework_message, numb_of_lesson):
     day = dict_tables.get(number_of_day)
     for data in day.select():
@@ -114,21 +105,25 @@ while True:
             user_info = get_info(event.user_id)
             add_in_table(event.user_id)
             if event.text.lower() in ("привет", "здорова", "ку", "хай", "прив",
-                                      "йоу", "начать"):
-                write_msg(event.user_id, "Здравствуй "
+                                      "йоу", "начать", "hi"):
+                write_msg(event.user_id, "Здравствуй, "
                           + user_info[0]['first_name'])
                 write_msg(event.user_id, "Хочешь узнать как пользоваться ботом?"
-                                         " Напиши .1.")
-            if event.text.lower() == ".1.":
+                                         " Напиши !!")
+            if event.text.lower() == "!!":
                 write_msg(event.user_id, usr_m)
             if event.text.lower() == "расписание":
                 write_msg(event.user_id, "На какой день нужно расписание?")
                 send_weekdays(st="show")
                 for event_send_schedule in longpoll.listen():
                     if event_send_schedule.type == VkEventType.MESSAGE_NEW and not \
-                            event_send_schedule.from_me and len(event_send_schedule.text) <= 1:
-                        show_lessons(int(event_send_schedule.text), status=False)
-                        break
+                            event_send_schedule.from_me and len(event_send_schedule.text) == 1:
+                        try:
+                            show_lessons(int(event_send_schedule.text), status=False)
+                            break
+                        except ValueError:
+                            write_msg(event_send_schedule.user_id, "Недопустимая цифра")
+                            break
             if event.text.lower() == "урок":
                 if dt.datetime.today().month in (6, 7, 8):
                     write_msg(event.user_id, "Сейчас лето, отдыхай :D")
@@ -141,60 +136,60 @@ while True:
 
                 else:
                     time_local = time.localtime()
-                    minutes = (60 * time_local.tm_hour) + time_local.tm_min
-                    if minutes < 510:
+                    minutes = (60 * time_local.tm_hour) + time_local.tm_min + 180
+                    if 360 <= minutes <= 510:
                         write_msg(event.user_id,
                                   "До начала первого урока(мин.): " +
                                   str(510 - minutes))
-                    elif 510 < minutes < 550:
+                    elif 510 <= minutes <= 550:
                         write_msg(event.user_id,
                                   "До конца первого урока(мин.): " +
                                   str(550 - minutes))
-                    elif 550 < minutes < 560:
+                    elif 550 <= minutes <= 560:
                         write_msg(event.user_id,
                                   "До начала второго урока(мин.): " +
                                   str(560 - minutes))
-                    elif 560 < minutes < 600:
+                    elif 560 <= minutes <= 600:
                         write_msg(event.user_id,
                                   "До конца второго урока(мин.): " +
                                   str(600 - minutes))
-                    elif 600 < minutes < 615:
+                    elif 600 <= minutes <= 615:
                         write_msg(event.user_id,
                                   "До начала третьего урока(мин.): " +
                                   str(615 - minutes))
-                    elif 615 < minutes < 655:
+                    elif 615 <= minutes <= 655:
                         write_msg(event.user_id,
                                   "До конца третьего урока(мин.): " +
                                   str(655 - minutes))
-                    elif 655 < minutes < 670:
+                    elif 655 <= minutes <= 670:
                         write_msg(event.user_id,
                                   "До начала четвертого урока(мин.): " +
                                   str(670 - minutes))
-                    elif 670 < minutes < 710:
+                    elif 670 <= minutes <= 710:
                         write_msg(event.user_id,
                                   "До конца четвертого урока(мин.): " +
                                   str(710 - minutes))
-                    elif 710 < minutes < 725:
+                    elif 710 <= minutes <= 725:
                         write_msg(event.user_id,
                                   "До начала пятого урока(мин.): " +
                                   str(725 - minutes))
-                    elif 725 < minutes < 765:
+                    elif 725 <= minutes <= 765:
                         write_msg(event.user_id,
                                   "До конца пятого урока(мин.): " +
                                   str(765 - minutes))
-                    elif 765 < minutes < 775:
+                    elif 765 <= minutes <= 775:
                         write_msg(event.user_id,
                                   "До начала шестого урока(мин.): " +
                                   str(775 - minutes))
-                    elif 775 < minutes < 815:
+                    elif 775 <= minutes <= 815:
                         write_msg(event.user_id,
                                   "До конца шестого урока(мин.): " +
                                   str(815 - minutes))
-                    elif 815 < minutes < 825:
+                    elif 815 <= minutes <= 825:
                         write_msg(event.user_id,
                                   "До начала седьмого урока(мин.): " +
                                   str(825 - minutes))
-                    elif 825 < minutes < 865:
+                    elif 825 <= minutes <= 865:
                         write_msg(event.user_id,
                                   "До конца седьмого урока(мин.): " +
                                   str(865 - minutes))
@@ -206,8 +201,13 @@ while True:
                 for event_show_hw in longpoll.listen():
                     if event_show_hw.type == VkEventType.MESSAGE_NEW and not \
                             event_show_hw.from_me:
-                        show_lessons(int(event_show_hw.text))
-                        break
+                        try:
+                            show_lessons(int(event_show_hw.text))
+                            break
+                        except ValueError:
+                            write_msg(event_show_hw.user_id, "Я ожидал цифру в диапазоне 1-5")
+                            break
+
             if (event.user_id == 194674349 or event.user_id == 183461346) \
                     and event.text.lower() == "дз+":
                 counter = 1
@@ -217,24 +217,26 @@ while True:
                 for dz_msg in longpoll.listen():
                     if dz_msg.type == VkEventType.MESSAGE_NEW and \
                             not dz_msg.from_me:
-                        if counter == 1 and len(dz_msg.text) == 1:
-                            numb_day = int(dz_msg.text)
-                            send_current_lsn(numb_day)
+                        try:
+                            if counter == 1 and len(dz_msg.text) == 1 and int(dz_msg.text) in range(1, 6):
+                                numb_day = int(dz_msg.text)
+                                send_current_lsn(numb_day)
 
-                        elif counter == 2 and len(dz_msg.text) == 1:
+                            elif counter == 2 and len(dz_msg.text) == 1 and int(dz_msg.text) in range(1, 8):
 
-                            numb_lesson = dz_msg.text
-                            write_msg(dz_msg.user_id, f"Следующее сообщение "
-                                                      f"будет записано как дз:")
+                                numb_lesson = dz_msg.text
+                                write_msg(dz_msg.user_id, f"Следующее сообщение "
+                                                          f"будет записано как дз:")
 
-                        elif counter == 3:
+                            elif counter == 3:
 
-                            add_homework(number_of_day=numb_day,
-                                         homework_message=dz_msg.text,
-                                         numb_of_lesson=int(numb_lesson))
-                            write_msg(event.user_id, "Домашнее задание успешно "
-                                                     "добавлено.")
+                                add_homework(number_of_day=numb_day,
+                                             homework_message=dz_msg.text,
+                                             numb_of_lesson=int(numb_lesson))
+                                write_msg(event.user_id, "Домашнее задание успешно "
+                                                         "добавлено.")
+                                break
+                            counter += 1
+                        except ValueError:
+                            write_msg(dz_msg.user_id, "Получен неверный ответ, попробуй снова написать команду")
                             break
-                        else:
-                            break
-                        counter += 1
