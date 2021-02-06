@@ -27,13 +27,7 @@ dict_tables = {
     5: FRIDAY
 }
 
-<<<<<<< HEAD
 token = "2ea22b0432d68245816992228cb95135729f1724e2b2b1cd3be8b038cd97d854df7af3a2c9244f18c2493"
-=======
-
-token = "..."
-
->>>>>>> 450ee61c6afbcf9303dd5b7bf128af6047c3a536
 
 vk = vk_api.VkApi(token=token)
 
@@ -122,14 +116,14 @@ while True:
                 write_msg(event.user_id, "На какой день нужно расписание?")
                 send_weekdays(st="show")
                 for event_send_schedule in longpoll.listen():
-                    if event_send_schedule.type == VkEventType.MESSAGE_NEW and not \
-                            event_send_schedule.from_me and len(event_send_schedule.text) == 1:
-                        try:
+                    try:
+                        if event_send_schedule.type == VkEventType.MESSAGE_NEW and not \
+                                event_send_schedule.from_me:
                             show_lessons(int(event_send_schedule.text), status=False)
                             break
-                        except ValueError:
-                            write_msg(event_send_schedule.user_id, "Недопустимая цифра")
-                            break
+                    except (AttributeError, ValueError):
+                        write_msg(event_send_schedule.user_id, "Недопустимая цифра")
+                        break
             if event.text.lower() == "урок":
                 if dt.datetime.today().month in (6, 7, 8):
                     write_msg(event.user_id, "Сейчас лето, отдыхай :D")
@@ -210,7 +204,7 @@ while True:
                         try:
                             show_lessons(int(event_show_hw.text))
                             break
-                        except ValueError:
+                        except (AttributeError, ValueError):
                             write_msg(event_show_hw.user_id, "Я ожидал цифру в диапазоне 1-5")
                             break
 
