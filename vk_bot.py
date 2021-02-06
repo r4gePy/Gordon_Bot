@@ -6,12 +6,14 @@ import json
 from classes_for_tables import *
 from keyboards import *
 
+# "help" message
 usr_m = "Для общения с ботом используй цветные блоки(клавиатуру):\n " \
         "'Урок' - ответом бота будет количество минут, оставшееся до конца " \
         "или начала урока\n" \
         "'Расписание' - ты получишь расписание уроков на выбранный день\n" \
         "'Узнать ДЗ' - узнаешь домашнее задание на любой день"
 
+# dict with days
 dict_days = {
     1: "Понедельник",
     2: "Вторник",
@@ -19,6 +21,8 @@ dict_days = {
     4: "Четверг",
     5: "Пятница"
 }
+
+# dict with tables
 dict_tables = {
     1: MONDAY,
     2: TUESDAY,
@@ -27,14 +31,20 @@ dict_tables = {
     5: FRIDAY
 }
 
+# !!!TOKEN!!!!
 token = "2ea22b0432d68245816992228cb95135729f1724e2b2b1cd3be8b038cd97d854df7af3a2c9244f18c2493"
 
+# connecting token with lib
 vk = vk_api.VkApi(token=token)
 
+# connecting poll with vk
 longpoll = VkLongPoll(vk)
 
 
 def send_weekdays(st='add'):
+
+    """ function for sending schedule """
+
     msg_schedule = ""
     for numb, day in dict_days.items():
         msg_schedule += f'{str(numb)}. {day}\n'
@@ -47,6 +57,9 @@ def send_weekdays(st='add'):
 
 
 def send_current_lsn(numb_of_day):
+
+    """ function for collect and send lesson schedules per day """
+
     msg_lsns = ""
     day_lsn = dict_tables.get(numb_of_day)
     for day in day_lsn.select():
@@ -55,10 +68,16 @@ def send_current_lsn(numb_of_day):
 
 
 def get_info(user_id):
+
+    """ Function, that return user information into a variable"""
+
     return vk.method("users.get", {"user_ids": user_id})
 
 
 def add_in_table(id_for_info):
+
+    """Function, that add user in a data base"""
+
     st = True
     for usr_id in INFO.select():
         if usr_id.ID_VK == id_for_info:
@@ -72,6 +91,9 @@ def add_in_table(id_for_info):
 
 
 def write_msg(user_id, message):
+
+    """Function, that allows a bot to write messages"""
+
     vk.method("messages.send",
               {"user_id": user_id,
                "message": message,
@@ -81,6 +103,9 @@ def write_msg(user_id, message):
 
 
 def add_homework(number_of_day, homework_message, numb_of_lesson):
+
+    """Function for adding homework in data base"""
+
     day = dict_tables.get(number_of_day)
     for data in day.select():
         if data.id == numb_of_lesson:
@@ -89,6 +114,9 @@ def add_homework(number_of_day, homework_message, numb_of_lesson):
 
 
 def show_lessons(day, status=True):
+
+    """Function, that send homework"""
+
     lesson = dict_tables.get(day)
     schedule = ''
     for hw in lesson.select():
