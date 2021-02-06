@@ -3,13 +3,6 @@ from peewee import *
 db_info = SqliteDatabase("USERS.db")
 db_hw = SqliteDatabase("HOMEWORK.db")
 
-dict_monday = {
-    1: "Математика",
-    2: "Русский язык",
-    3: "Литература",
-    4: "English"
-}
-
 
 class MONDAY(Model):
     Lesson = TextField()
