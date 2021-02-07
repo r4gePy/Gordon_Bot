@@ -13,7 +13,7 @@ usr_m = "Для общения с ботом используй цветные �
         "'Расписание' - ты получишь расписание уроков на выбранный день\n" \
         "'Узнать ДЗ' - узнаешь домашнее задание на любой день"
 
-# dict with days
+# Dict with days
 dict_days = {
     1: "Понедельник",
     2: "Вторник",
@@ -22,7 +22,7 @@ dict_days = {
     5: "Пятница"
 }
 
-# dict with tables
+# Dict with tables
 dict_tables = {
     1: MONDAY,
     2: TUESDAY,
@@ -34,16 +34,16 @@ dict_tables = {
 # !!!TOKEN!!!!
 token = "2ea22b0432d68245816992228cb95135729f1724e2b2b1cd3be8b038cd97d854df7af3a2c9244f18c2493"
 
-# connecting token with lib
+# Connecting token with lib
 vk = vk_api.VkApi(token=token)
 
-# connecting poll with vk
+# Connecting poll with vk
 longpoll = VkLongPoll(vk)
 
 
 def send_weekdays(st='add'):
 
-    """ function for sending schedule """
+    """ Function for sending schedule """
 
     msg_schedule = ""
     for numb, day in dict_days.items():
@@ -58,7 +58,7 @@ def send_weekdays(st='add'):
 
 def send_current_lsn(numb_of_day):
 
-    """ function for collect and send lesson schedules per day """
+    """ Function for collect and send lesson schedules per day """
 
     msg_lsns = ""
     day_lsn = dict_tables.get(numb_of_day)
@@ -69,14 +69,14 @@ def send_current_lsn(numb_of_day):
 
 def get_info(user_id):
 
-    """ Function, that return user information into a variable"""
+    """ Function, that return user information into a variable  """
 
     return vk.method("users.get", {"user_ids": user_id})
 
 
 def add_in_table(id_for_info):
 
-    """Function, that add user in a data base"""
+    """  Function, that add user in a data base  """
 
     st = True
     for usr_id in INFO.select():
@@ -92,7 +92,7 @@ def add_in_table(id_for_info):
 
 def write_msg(user_id, message):
 
-    """Function, that allows a bot to write messages"""
+    """  Function, that allows a bot to write messages  """
 
     vk.method("messages.send",
               {"user_id": user_id,
@@ -104,7 +104,7 @@ def write_msg(user_id, message):
 
 def add_homework(number_of_day, homework_message, numb_of_lesson):
 
-    """Function for adding homework in data base"""
+    """  Function for adding homework in data base  """
 
     day = dict_tables.get(number_of_day)
     for data in day.select():
@@ -115,7 +115,7 @@ def add_homework(number_of_day, homework_message, numb_of_lesson):
 
 def show_lessons(day, status=True):
 
-    """Function, that send homework"""
+    """  Function, that send homework  """
 
     lesson = dict_tables.get(day)
     schedule = ''
@@ -246,11 +246,11 @@ while True:
                     if dz_msg.type == VkEventType.MESSAGE_NEW and \
                             not dz_msg.from_me:
                         try:
-                            if counter == 1 and len(dz_msg.text) == 1 and int(dz_msg.text) in range(1, 6):
+                            if counter == 1 and int(dz_msg.text) in range(1, 6):
                                 numb_day = int(dz_msg.text)
                                 send_current_lsn(numb_day)
 
-                            elif counter == 2 and len(dz_msg.text) == 1 and int(dz_msg.text) in range(1, 8):
+                            elif counter == 2 and int(dz_msg.text) in range(1, 8):
 
                                 numb_lesson = dz_msg.text
                                 write_msg(dz_msg.user_id, f"Следующее сообщение "
@@ -264,7 +264,9 @@ while True:
                                 write_msg(event.user_id, "Домашнее задание успешно "
                                                          "добавлено.")
                                 break
+                            elif len(dz_msg.text) > 1:
+                                write_msg(dz_msg.user_id, "Неверный ответ.")
                             counter += 1
-                        except ValueError:
+                        except (ValueError, AttributeError):
                             write_msg(dz_msg.user_id, "Получен неверный ответ, попробуй снова написать команду")
                             break
