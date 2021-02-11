@@ -1,5 +1,6 @@
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
+from vk_api import VkUpload
 import datetime as dt
 import time
 import json
@@ -7,11 +8,7 @@ from classes_for_tables import *
 from keyboards import *
 
 # "help" message
-usr_m = "Для общения с ботом используй цветные блоки(клавиатуру):\n " \
-        "'Урок' - ответом бота будет количество минут, оставшееся до конца " \
-        "или начала урока\n" \
-        "'Расписание' - ты получишь расписание уроков на выбранный день\n" \
-        "'Узнать ДЗ' - узнаешь домашнее задание на любой день"
+usr_m = "Для общения с ботом используй цветные блоки(клавиатуру) находящуюся слева от кнопки отправки сообщения"
 
 # Dict with days
 dict_days = {
@@ -39,6 +36,9 @@ vk = vk_api.VkApi(token=token)
 
 # Connecting poll with vk
 longpoll = VkLongPoll(vk)
+
+image = "C:/Users/arsen/PycharmProjects/Gordon_Bot-master/images/uxJLW01eGAk.jpg"
+upload = VkUpload(vk)
 
 
 def send_weekdays(st='add'):
@@ -127,6 +127,14 @@ def show_lessons(day, status=True):
     write_msg(event.user_id, schedule)
 
 
+def send_image(usr_id, attachment):
+    vk.method("messages.send",
+              {"user_id": usr_id,
+               "message": "",
+               "random_id": 0,
+               "attachment": ','.join(attachment)})
+
+
 while True:
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and not event.from_me:
@@ -134,12 +142,12 @@ while True:
             add_in_table(event.user_id)
             if event.text.lower() in ("привет", "здорова", "ку", "хай", "прив",
                                       "йоу", "начать", "hi"):
-                write_msg(event.user_id, "Здравствуй, "
-                          + user_info[0]['first_name'])
-                write_msg(event.user_id, "Хочешь узнать как пользоваться ботом?"
-                                         " Напиши !!")
-            if event.text.lower() == "!!":
-                write_msg(event.user_id, usr_m)
+                write_msg(event.user_id, f"Здравствуй, {user_info[0]['first_name']}\n {usr_m}")
+            # if event.text.lower() == "шпора":
+            #    attachments = []
+            #    upload_image = upload.photo_messages(photos=image)[0]
+            #    attachments.append('photo{}_{}'.format(upload_image['owner_id'], upload_image['id']))
+            #    send_image(event.user_id, attachments)
             if event.text.lower() == "расписание":
                 write_msg(event.user_id, "На какой день нужно расписание?")
                 send_weekdays(st="show")
@@ -236,7 +244,7 @@ while True:
                             write_msg(event_show_hw.user_id, "Я ожидал цифру в диапазоне 1-5")
                             break
 
-            if (event.user_id == 194674349 or event.user_id == 183461346) \
+            if (event.user_id == 194674349 or event.user_id == 183461346 or event.user_id == 213696138) \
                     and event.text.lower() == "дз+":
                 counter = 1
                 numb_day = ""
