@@ -124,7 +124,7 @@ def show_lessons(day, status=True):
             schedule += f"{hw.Lesson} - {hw.HW}\n"
         else:
             schedule += f"{hw.id}.{hw.Lesson}\n"
-    write_msg(event.user_id, schedule)
+    write_msg(user_schedule, schedule)
 
 
 def send_image(usr_id, attachment):
@@ -149,16 +149,17 @@ while True:
             #    attachments.append('photo{}_{}'.format(upload_image['owner_id'], upload_image['id']))
             #    send_image(event.user_id, attachments)
             if event.text.lower() == "расписание":
+                user_schedule = event.user_id
                 write_msg(event.user_id, "На какой день нужно расписание?")
                 send_weekdays(st="show")
                 for event_send_schedule in longpoll.listen():
                     try:
-                        if event_send_schedule.type == VkEventType.MESSAGE_NEW and not \
+                        if event_send_schedule.type == VkEventType.MESSAGE_NEW and event_send_schedule.user_id == user_schedule and not \
                                 event_send_schedule.from_me:
                             show_lessons(int(event_send_schedule.text), status=False)
                             break
                     except (AttributeError, ValueError):
-                        write_msg(event_send_schedule.user_id, "Недопустимая цифра")
+                        write_msg(user_schedule.user_id, "Недопустимая цифра")
                         break
             if event.text.lower() == "урок":
                 if dt.datetime.today().month in (6, 7, 8):
@@ -232,16 +233,17 @@ while True:
                     else:
                         write_msg(event.user_id, "Уроки закончились.")
             if event.text.lower() == "узнать дз":
+                user_homework = event.user_id
                 write_msg(event.user_id, "На какой день ты хочешь узнать ДЗ?")
                 send_weekdays(st="show")
                 for event_show_hw in longpoll.listen():
-                    if event_show_hw.type == VkEventType.MESSAGE_NEW and not \
+                    if event_show_hw.type == VkEventType.MESSAGE_NEW and event_show_hw.user_id == user_homework and not \
                             event_show_hw.from_me:
                         try:
                             show_lessons(int(event_show_hw.text))
                             break
                         except (AttributeError, ValueError):
-                            write_msg(event_show_hw.user_id, "Я ожидал цифру в диапазоне 1-5")
+                            write_msg(user_homework, "Я ожидал цифру в диапазоне 1-5")
                             break
 
             if (event.user_id == 194674349 or event.user_id == 183461346 or event.user_id == 213696138) \
