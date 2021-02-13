@@ -113,7 +113,7 @@ def add_homework(number_of_day, homework_message, numb_of_lesson):
             data.save()
 
 
-def show_lessons(day, status=True):
+def show_lessons(day, id, status=True):
 
     """  Function, that send homework  """
 
@@ -124,7 +124,7 @@ def show_lessons(day, status=True):
             schedule += f"{hw.Lesson} - {hw.HW}\n"
         else:
             schedule += f"{hw.id}.{hw.Lesson}\n"
-    write_msg(user_schedule, schedule)
+    write_msg(id, schedule)
 
 
 def send_image(usr_id, attachment):
@@ -156,7 +156,7 @@ while True:
                     try:
                         if event_send_schedule.type == VkEventType.MESSAGE_NEW and event_send_schedule.user_id == user_schedule and not \
                                 event_send_schedule.from_me:
-                            show_lessons(int(event_send_schedule.text), status=False)
+                            show_lessons(int(event_send_schedule.text), user_schedule, status=False)
                             break
                     except (AttributeError, ValueError):
                         write_msg(user_schedule.user_id, "Недопустимая цифра")
