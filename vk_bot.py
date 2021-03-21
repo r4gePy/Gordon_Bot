@@ -1,6 +1,5 @@
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
-from vk_api import VkUpload
 import datetime as dt
 import time
 import json
@@ -37,9 +36,6 @@ vk = vk_api.VkApi(token=token)
 # Connecting poll with vk
 longpoll = VkLongPoll(vk)
 
-image = "C:/Users/arsen/PycharmProjects/Gordon_Bot-master/images/uxJLW01eGAk.jpg"
-upload = VkUpload(vk)
-
 
 def send_weekdays(st='add'):
 
@@ -60,11 +56,11 @@ def send_current_lsn(numb_of_day):
 
     """ Function for collect and send lesson schedules per day """
 
-    msg_lsns = ""
+    msg_lessons = ""
     day_lsn = dict_tables.get(numb_of_day)
     for day in day_lsn.select():
-        msg_lsns += str(day.id) + '. ' + day.Lesson + '\n'
-    write_msg(event.user_id, msg_lsns)
+        msg_lessons += str(day.id) + '. ' + day.Lesson + '\n'
+    write_msg(event.user_id, msg_lessons)
 
 
 def get_info(user_id):
@@ -113,7 +109,7 @@ def add_homework(number_of_day, homework_message, numb_of_lesson):
             data.save()
 
 
-def show_lessons(day, id, status=True):
+def show_lessons(day, id_user, status=True):
 
     """  Function, that send homework  """
 
@@ -124,15 +120,7 @@ def show_lessons(day, id, status=True):
             schedule += f"{hw.Lesson} - {hw.HW}\n"
         else:
             schedule += f"{hw.id}.{hw.Lesson}\n"
-    write_msg(id, schedule)
-
-
-def send_image(usr_id, attachment):
-    vk.method("messages.send",
-              {"user_id": usr_id,
-               "message": "",
-               "random_id": 0,
-               "attachment": ','.join(attachment)})
+    write_msg(id_user, schedule)
 
 
 while True:
@@ -154,8 +142,9 @@ while True:
                 send_weekdays(st="show")
                 for event_send_schedule in longpoll.listen():
                     try:
-                        if event_send_schedule.type == VkEventType.MESSAGE_NEW and event_send_schedule.user_id == user_schedule and not \
-                                event_send_schedule.from_me:
+                        if event_send_schedule.type == VkEventType.MESSAGE_NEW and \
+                                event_send_schedule.user_id == user_schedule and \
+                                not event_send_schedule.from_me:
                             show_lessons(int(event_send_schedule.text), user_schedule, status=False)
                             break
                     except (AttributeError, ValueError):
@@ -237,10 +226,10 @@ while True:
                 write_msg(event.user_id, "На какой день ты хочешь узнать ДЗ?")
                 send_weekdays(st="show")
                 for event_show_hw in longpoll.listen():
-                    if event_show_hw.type == VkEventType.MESSAGE_NEW and event_show_hw.user_id == user_homework and not \
-                            event_show_hw.from_me:
+                    if event_show_hw.type == VkEventType.MESSAGE_NEW and event_show_hw.user_id == user_homework and \
+                            not event_show_hw.from_me:
                         try:
-                            show_lessons(int(event_show_hw.text))
+                            show_lessons(int(event_show_hw.text), user_homework)
                             break
                         except (AttributeError, ValueError):
                             write_msg(user_homework, "Я ожидал цифру в диапазоне 1-5")
